@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Interactive Image Website</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="image-container">
+        <img src="/mnt/data/IMG_3608.jpeg" alt="Big Ripper 29" class="background-image" id="background-image">
+        <!-- Interactive Buttons -->
+        <div class="interactive-button" id="btn-ghost-train" aria-label="Ghost Train Haze" style="top: 85%; left: 40%;" tabindex="0">
+            <span>Ghost Train Haze</span>
+        </div>
+        <div class="interactive-button" id="btn-big-ripper" aria-label="Big Ripper 29" style="top: 35%; left: 45%;" tabindex="0">
+            <span>Big Ripper 29</span>
+        </div>
+    </div>
+
+    <!-- Pop-up Sections -->
+    <div id="popup-ghost-train" class="popup" aria-hidden="true">
+        <div class="popup-content">
+            <h2>Ghost Train Haze - Sativa</h2>
+            <p>Loading information...</p>
+            <button class="close-popup">Close</button>
+        </div>
+    </div>
+
+    <div id="popup-big-ripper" class="popup" aria-hidden="true">
+        <div class="popup-content">
+            <h2>Big Ripper 29</h2>
+            <p>Loading information...</p>
+            <button class="close-popup">Close</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
