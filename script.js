@@ -1,42 +1,107 @@
-// Lazy loading for images (using intersection observer)
-document.addEventListener('DOMContentLoaded', function() {
-    let lazyImages = [].slice.call(document.querySelectorAll('img.lazyload'));
+// Get all popup elements
+const popupGhostTrain = document.getElementById('popup-ghost-train');
+const popupBigRipper = document.getElementById('popup-big-ripper');
 
-    if ('IntersectionObserver' in window) {
-        let lazyImageObserver = new IntersectionObserver(function(entries, observer) {
-            entries.forEach(function(entry) {
-                if (entry.isIntersecting) {
-                    let lazyImage = entry.target;
-                    lazyImage.src = lazyImage.dataset.src;
-                    lazyImage.classList.remove('lazyload');
-                    lazyImageObserver.unobserve(lazyImage);
-                }
-            });
-        });
+// Get buttons to open popups
+const btnGhostTrain = document.getElementById('btn-ghost-train');
+const btnBigRipper = document.getElementById('btn-big-ripper');
 
-        lazyImages.forEach(function(lazyImage) {
-            lazyImageObserver.observe(lazyImage);
-        });
+// Get buttons to close popups
+const closeButtons = document.querySelectorAll('.close-popup');
+
+// Function to open popup with 3D animation and load content dynamically
+function openPopup(popup, url) {
+    popup.classList.add('popup-active');
+    popup.setAttribute('aria-hidden', 'false');
+    loadPopupContent(popup, url);
+}
+
+// Function to close popup with animation
+function closePopup(popup) {
+    popup.classList.remove('popup-active');
+    popup.setAttribute('aria-hidden', 'true');
+}
+
+// Event listeners to open popups
+btnGhostTrain.addEventListener('click', () => {
+    openPopup(popupGhostTrain, 'ghost-train-info.html');
+});
+
+btnBigRipper.addEventListener('click', () => {
+    openPopup(popupBigRipper, 'big-ripper-info.html');
+});
+
+// Event listeners to close popups
+closeButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        closePopup(popupGhostTrain);
+        closePopup(popupBigRipper);
+    });
+});
+
+// Close popup on outside click
+window.addEventListener('click', (e) => {
+    if (e.target.classList.contains('popup')) {
+        closePopup(e.target);
     }
 });
 
-// Initialize GSAP for parallax scrolling effect
-gsap.registerPlugin(ScrollTrigger);
-gsap.to("#product-image", {
-    scrollTrigger: {
-        trigger: "#interactive-image",
-        start: "top top",
-        end: "bottom top",
-        scrub: true,
-    },
-    y: "50%", // Image moves at 50% speed of scrolling
+// Swipe to close on touch devices
+let touchStartX = 0;
+let touchEndX = 0;
+
+document.body.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
 });
 
-// Initialize Tippy.js for interactive tooltips on hotspots
-tippy('.hotspot-link', {
-    content: (reference) => reference.getAttribute('title'), // Dynamic tooltip content
-    animation: 'scale',
-    theme: 'light',
-    duration: [300, 300],
-    placement: 'top',
+document.body.addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    if (touchEndX < touchStartX) {
+        closePopup(popupGhostTrain);
+        closePopup(popupBigRipper);
+    }
+});
+
+// Function to dynamically load content using AJAX
+function loadPopupContent(popup, url) {
+    const popupContent = popup.querySelector('p');
+    fetch(url)
+        .then(response => response.text())
+        .then(data => {
+            popupContent.innerHTML = data;
+        })
+        .catch(error => {
+            popupContent.innerHTML = 'Error loading content. Please try again.';
+        });
+}
+
+// Add mousemove event for parallax effect
+document.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth) - 0.5;
+    const y = (e.clientY / window.innerHeight) - 0.5;
+    document.getElementById('background-image').style.transform = `translate(${x * 20}px, ${y * 20}px) scale(1.1)`;
+});
+
+// Add voice command functionality (using Speech Recognition API)
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognition = new SpeechRecognition();
+
+recognition.onstart = function () {
+    console.log('Voice recognition started.');
+};
+
+recognition.onresult = function (event) {
+    const voiceCommand = event.results[0][0].transcript.toLowerCase();
+    if (voiceCommand.includes('ghost train')) {
+        openPopup(popupGhostTrain, 'ghost-train-info.html');
+    } else if (voiceCommand.includes('big ripper')) {
+        openPopup(popupBigRipper, 'big-ripper-info.html');
+    }
+};
+
+// Activate voice recognition on button click
+document.body.addEventListener('keydown', (e) => {
+    if (e.key === 'v') {
+        recognition.start();
+    }
 });
